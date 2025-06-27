@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DompetKu</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="images/icons/icon-192x192.png">
+    <meta name="theme-color" content="#5A54D9">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body data-theme="dark">
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div>
+                <div class="sidebar-header">
+                    <div class="logo"><div class="logo-shape logo-shape-1"></div><div class="logo-shape logo-shape-2"></div></div>
+                    <h1>DompetKu</h1>
+                </div>
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li class="active"><a href="#" data-view="dashboard"><i class="fa-solid fa-chart-pie"></i> <span>Dashboard</span></a></li>
+                        <li><a href="#" data-view="transactions"><i class="fa-solid fa-right-left"></i> <span>Transaksi</span></a></li>
+                        <li><a href="#" data-view="report"><i class="fa-solid fa-file-invoice-dollar"></i> <span>Laporan</span></a></li>
+                        <li><a href="#" data-view="budgets"><i class="fa-solid fa-bullseye"></i> <span>Anggaran</span></a></li>
+                        <li><a href="#" data-view="assets"><i class="fa-solid fa-sack-dollar"></i> <span>Aset</span></a></li>
+                        <li class="mobile-only"><a href="#" data-view="more"><i class="fa-solid fa-ellipsis"></i> <span>Lainnya</span></a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="sidebar-footer">
+                <a href="#" data-view="settings"><i class="fa-solid fa-gear"></i> Pengaturan</a>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme-id="light"><i class="fa-solid fa-sun"></i></button>
+                    <button class="theme-btn active" data-theme-id="dark"><i class="fa-solid fa-moon"></i></button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-title">
+                    <h2 id="page-title">Dashboard</h2>
+                    <p id="page-subtitle">Lacak dan analisis performa keuangan Anda</p>
+                </div>
+                <div class="header-actions">
+                     <button class="btn" id="add-wallet-btn"><i class="fa-solid fa-wallet"></i> Tambah Dompet</button>
+                     <button class="btn btn-primary" id="add-transaction-btn-global"><i class="fa-solid fa-plus"></i> Tambah Transaksi</button>
+                </div>
+            </header>
+
+            <section id="dashboard-view" class="view active">
+                <div class="dashboard-grid">
+                    <div class="card balance-card">
+                        <div class="card-header">
+                            <div><p>Perkiraan Total Aset Bersih</p><h3 id="db-my-balance">Rp 0</h3></div>
+                            <select id="db-wallet-filter" class="btn"></select>
+                        </div>
+                         <div id="db-individual-balances"></div>
+                         <div class="balance-details">
+                             <div class="detail-item"><p>Pemasukan (30 hari)</p><h4 id="db-total-income" class="text-success">Rp 0</h4></div>
+                             <div class="detail-item"><p>Pengeluaran (30 hari)</p><h4 id="db-total-expense" class="text-danger">Rp 0</h4></div>
+                         </div>
+                    </div>
+                    <div class="card spending-card" id="report-card-dashboard">
+                         <div class="card-header"><h4>Pengeluaran per Kategori</h4> <button class="btn-icon" id="db-download-pdf-btn"><i class="fa-solid fa-file-pdf"></i></button></div>
+                         <div class="spending-chart-container"><canvas id="db-spending-chart"></canvas><div class="chart-center-text"><strong id="db-spending-total">Rp 0</strong><span id="db-spending-period">Bulan Ini</span></div></div>
+                         <div id="db-spending-legend" class="spending-legend"></div>
+                    </div>
+                    <div class="card budgets-card">
+                        <div class="card-header"><h4>Progres Anggaran</h4><button class="view-all-btn" data-view="budgets">Lihat Semua</button></div>
+                        <div id="db-budget-progress" class="progress-list"></div>
+                    </div>
+                    <div class="card transactions-card">
+                        <div class="card-header"><h4>Transaksi Terkini</h4><button class="view-all-btn" data-view="transactions">Lihat Semua</button></div>
+                        <div id="db-recent-transactions" class="transaction-list-condensed"></div>
+                    </div>
+                    <div class="card" id="dashboard-investments-card">
+                    </div>
+                    <div class="card" id="dashboard-loans-card">
+                    </div>
+                </div>
+            </section>
+            
+            <section id="transactions-view" class="view">
+                <div class="card full-page-card">
+                    <div class="card-header">
+                        <h4>Semua Transaksi</h4>
+                        <div class="filter-controls" style="display: flex; gap: 12px; align-items: center;">
+                             <select id="transaction-category-filter" class="btn"></select>
+                             <select id="transaction-wallet-filter" class="btn"></select>
+                             <input type="text" placeholder="Cari transaksi..." id="search-transactions">
+                        </div>
+                    </div>
+                    <div class="transaction-list-full">
+                        <div class="transaction-list-header"><span>DESKRIPSI</span><span>KATEGORI</span><span>TANGGAL</span><span>JUMLAH</span><span>DOMPET</span></div>
+                        <div id="transaction-list-container"></div>
+                    </div>
+                </div>
+            </section>
+             <section id="report-view" class="view">
+                <div class="card full-page-card" id="report-card-main">
+                    <div class="card-header">
+                        <h4>Laporan Keuangan</h4>
+                        <div class="filter-controls-wrapper">
+                            <div class="filter-controls" id="report-period-filter">
+                                 <button class="btn" data-period="today">Hari Ini</button>
+                                 <button class="btn" data-period="week">Minggu Ini</button>
+                                 <button class="btn active" data-period="month">Bulan Ini</button>
+                                 <button class="btn" data-period="year">Tahun Ini</button>
+                                 <button class="btn" data-period="all">Semua</button>
+                                 <button class="btn" data-period="custom">Custom</button>
+                            </div>
+                            <div class="filter-controls hidden" id="report-custom-date-filter">
+                                <input type="date" id="report-start-date" class="btn">
+                                <span>-</span>
+                                <input type="date" id="report-end-date" class="btn">
+                           </div>
+                        </div>
+                    </div>
+                    <div class="report-grid">
+                        <div class="report-chart-container">
+                            <canvas id="report-trend-chart"></canvas>
+                        </div>
+                        <div class="report-summary">
+                            <h5>Ringkasan (Bulan Ini)</h5>
+                            <div class="summary-item"><span>Total Pemasukan</span><span id="report-total-income" class="text-success">Rp 0</span></div>
+                            <div class="summary-item"><span>Total Pengeluaran</span><span id="report-total-expense" class="text-danger">Rp 0</span></div>
+                             <div class="summary-item"><span>Total Biaya Admin</span><span id="report-total-admin-fee">Rp 0</span></div>
+                             <div class="summary-item"><span>Total Ongkos Kirim</span><span id="report-total-delivery-fee">Rp 0</span></div>
+                             <hr>
+                            <div class="summary-item total"><span>Arus Kas Bersih</span><span id="report-net-cashflow">Rp 0</span></div>
+                            <div class="report-actions">
+                               <button class="btn" id="report-download-csv-btn"><i class="fa-solid fa-file-csv"></i> Unduh CSV</button>
+                               <button class="btn" id="report-download-pdf-btn"><i class="fa-solid fa-file-pdf"></i> Unduh PDF</button>
+                           </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+             <section id="budgets-view" class="view">
+                <div class="card full-page-card">
+                    <div class="card-header"><h4>Manajemen Anggaran</h4> <button class="btn btn-primary" data-modal-id="add-budget-modal"><i class="fa-solid fa-plus"></i> Atur Anggaran</button></div>
+                    <div id="budget-list-container" class="settings-list"></div>
+                </div>
+            </section>
+             <section id="assets-view" class="view">
+                <div class="assets-grid">
+                    <div class="card full-page-card">
+                        <div class="card-header"><h4>Pinjaman</h4><button class="btn" data-modal-id="add-loan-modal"><i class="fa-solid fa-plus"></i> Tambah Pinjaman</button></div>
+                        <div id="loan-list-container" class="settings-list"></div>
+                    </div>
+                    <div class="card full-page-card">
+                        <div class="card-header"><h4>Investasi</h4><button class="btn" data-modal-id="add-investment-modal"><i class="fa-solid fa-plus"></i> Tambah Investasi</button></div>
+                        <div id="investment-list-container" class="settings-list"></div>
+                    </div>
+                </div>
+            </section>
+             <section id="more-view" class="view">
+                 <div class="card full-page-card">
+                     <div id="mobile-settings-container"></div>
+                 </div>
+             </section>
+             <section id="settings-view" class="view">
+                <div class="card full-page-card" id="desktop-settings-container"></div>
+            </section>
+        </main>
+    </div>
+
+    <div id="add-transaction-modal" class="modal-container">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Tambah Transaksi Baru</h3><button class="close-modal-btn" data-modal-id="add-transaction-modal">×</button></div>
+            <form id="add-transaction-form">
+                <div class="form-group"><label>Jenis Transaksi</label><select id="trans-type-selector"><option value="expense">Pengeluaran</option><option value="income">Pemasukan</option><option value="transfer">Transfer</option></select></div>
+                <div id="form-body-expense">
+                    <div class="form-group"><label for="trans-description-exp">Deskripsi</label><input type="text" id="trans-description-exp" name="trans-description-exp" required></div>
+                    <div class="form-group"><label for="trans-amount-exp">Jumlah</label><input type="text" inputmode="numeric" id="trans-amount-exp" name="trans-amount-exp" required></div>
+                    <div class="form-row">
+                        <div class="form-group"><label for="trans-admin-fee">Biaya Admin</label><input type="text" inputmode="numeric" id="trans-admin-fee" name="trans-admin-fee" value="0"></div>
+                        <div class="form-group"><label for="trans-delivery-fee">Ongkos Kirim</label><input type="text" inputmode="numeric" id="trans-delivery-fee" name="trans-delivery-fee" value="0"></div>
+                    </div>
+                    <div class="form-group"><label for="trans-category-exp">Kategori</label><select id="trans-category-exp" name="trans-category-exp" required></select></div>
+                </div>
+                <div id="form-body-income" class="hidden">
+                    <div class="form-group"><label for="trans-description-inc">Deskripsi</label><input type="text" id="trans-description-inc" name="trans-description-inc" required></div>
+                    <div class="form-group"><label for="trans-amount-inc">Jumlah</label><input type="text" inputmode="numeric" id="trans-amount-inc" name="trans-amount-inc" required></div>
+                </div>
+                <div id="form-body-transfer" class="hidden">
+                    <div class="form-group"><label for="trans-from-wallet">Dari Dompet</label><select id="trans-from-wallet" name="trans-from-wallet" required></select></div>
+                    <div class="form-group"><label for="trans-to-wallet">Ke Dompet</label><select id="trans-to-wallet" name="trans-to-wallet" required></select></div>
+                    <div class="form-group"><label for="trans-amount-tf">Jumlah</label><input type="text" inputmode="numeric" id="trans-amount-tf" name="trans-amount-tf" required></div>
+                    <div class="form-group"><label for="trans-admin-fee-tf">Biaya Admin</label><input type="text" inputmode="numeric" id="trans-admin-fee-tf" name="trans-admin-fee-tf" value="0"></div>
+                </div>
+                <div class="form-group" id="wallet-selector-group"><label for="trans-wallet">Dompet</label><select id="trans-wallet" name="trans-wallet" required></select></div>
+                <div class="form-group"><label for="trans-date">Tanggal</label><input type="date" id="trans-date" name="trans-date" required></div>
+                <button type="submit" class="btn btn-primary btn-full">Simpan Transaksi</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="add-wallet-modal" class="modal-container">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Tambah Dompet Baru</h3><button class="close-modal-btn" data-modal-id="add-wallet-modal">×</button></div>
+            <form id="add-wallet-form">
+                <div class="form-group"><label for="wallet-name">Nama Dompet</label><input type="text" id="wallet-name" placeholder="cth: Uang Tunai, GoPay" required></div>
+                <div class="form-group"><label for="wallet-balance">Saldo Awal</label><input type="text" inputmode="numeric" id="wallet-balance" value="0" required></div>
+                <button type="submit" class="btn btn-primary btn-full">Simpan Dompet</button>
+            </form>
+        </div>
+    </div>
+    <div id="add-budget-modal" class="modal-container">
+        <div class="modal-content">
+            <div class="modal-header"><h3 id="budget-modal-title">Atur Anggaran Baru</h3><button class="close-modal-btn" data-modal-id="add-budget-modal">×</button></div>
+            <form id="add-budget-form">
+                 <input type="hidden" id="budget-edit-id">
+                 <div class="form-group"><label for="budget-category">Kategori Pengeluaran</label><select id="budget-category" required></select></div>
+                 <div class="form-group"><label for="budget-amount">Jumlah Anggaran</label><input type="text" inputmode="numeric" id="budget-amount" placeholder="cth: 1.500.000" required></div>
+                 <button type="submit" class="btn btn-primary btn-full">Simpan Anggaran</button>
+            </form>
+        </div>
+    </div>
+    <div id="add-loan-modal" class="modal-container">
+        <div class="modal-content">
+            <div class="modal-header"><h3 id="loan-modal-title">Tambah Pinjaman Baru</h3><button class="close-modal-btn" data-modal-id="add-loan-modal">×</button></div>
+            <form id="add-loan-form">
+                <input type="hidden" id="loan-edit-id">
+                <div class="form-group"><label for="loan-name">Nama Pinjaman</label><input type="text" id="loan-name" placeholder="cth: Pinjaman Cicilan Motor" required></div>
+                <div class="form-group"><label for="loan-total">Total Pinjaman</label><input type="text" inputmode="numeric" id="loan-total" required></div>
+                <div class="form-group"><label for="loan-paid">Sudah Dibayar</label><input type="text" inputmode="numeric" id="loan-paid" value="0" required></div>
+                <div class="form-group"><label for="loan-due-date">Tanggal Jatuh Tempo</label><input type="date" id="loan-due-date"></div>
+                <button type="submit" class="btn btn-primary btn-full">Simpan Pinjaman</button>
+            </form>
+        </div>
+    </div>
+    <div id="add-investment-modal" class="modal-container">
+         <div class="modal-content">
+            <div class="modal-header"><h3 id="investment-modal-title">Tambah Investasi Baru</h3><button class="close-modal-btn" data-modal-id="add-investment-modal">×</button></div>
+            <form id="add-investment-form">
+                <input type="hidden" id="investment-edit-id">
+                <div class="form-group"><label for="investment-name">Nama Investasi</label><input type="text" id="investment-name" placeholder="cth: Saham BBCA" required></div>
+                <div class="form-group"><label for="investment-type">Jenis</label><select id="investment-type"><option>Reksa Dana</option><option>Saham</option><option>Emas</option><option>Kripto</option><option>Lainnya</option></select></div>
+                <div class="form-group"><label for="investment-initial">Modal Awal</label><input type="text" inputmode="numeric" id="investment-initial" required></div>
+                <div class="form-group"><label for="investment-current">Nilai Saat Ini</label><input type="text" inputmode="numeric" id="investment-current" required></div>
+                <button type="submit" class="btn btn-primary btn-full">Simpan Investasi</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
